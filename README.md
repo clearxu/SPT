@@ -1,3 +1,3 @@
 # SPT
-SPT official code
+## SPT official implementation.
 ## Codes will be posted upon receipt
