@@ -1,5 +1,10 @@
 # SPT
 ## SPT official implementation.
+To do：
+- [x] Model Code
+- [ ] Training code (Coming soon)
+- [ ] Testing code (Coming soon)
+- [ ] Trained Model (Coming soon)
 
 ## Environment:
 
