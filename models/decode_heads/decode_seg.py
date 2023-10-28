@@ -73,13 +73,13 @@ class TPN_DecoderLayer(TransformerDecoderLayer):
         del self.multihead_attn
         self.multihead_attn = Attention(
             kwargs['d_model'], num_heads=kwargs['nhead'], qkv_bias=True, attn_drop=0.1)
-        self.hilo1 = HiLo(dim=kwargs['d_model'], attn_drop=0.1)
+        self.hlfs = hlfs(dim=kwargs['d_model'], attn_drop=0.1)
 
     def forward(self, tgt: Tensor, memory: Tensor, tgt_mask: Optional[Tensor] = None,
                 memory_mask: Optional[Tensor] = None,
                 tgt_key_padding_mask: Optional[Tensor] = None,
                 memory_key_padding_mask: Optional[Tensor] = None) -> Tensor:
-        tgt2, attn2 = self.hilo(memory.transpose(0, 1), 32, 32, tgt)
+        tgt2, attn2 = self.hlfs(memory.transpose(0, 1), 32, 32, tgt)
 
 
         tgt = tgt + self.dropout2(tgt2)
@@ -91,12 +91,8 @@ class TPN_DecoderLayer(TransformerDecoderLayer):
 
 
 
-class HiLo(nn.Module):
-    """
-    HiLo Attention
+class hlfs(nn.Module):
 
-    Link: https://arxiv.org/abs/2205.13213
-    """
     def __init__(self, dim, num_heads=8, qkv_bias=False, qk_scale=None, attn_drop=0., proj_drop=0., window_size=3, alpha=0.9):
         super().__init__()
         assert dim % num_heads == 0, f"dim {dim} should be divided by num_heads {num_heads}."
@@ -127,7 +123,7 @@ class HiLo(nn.Module):
 
         self.scale = qk_scale or head_dim ** -0.5
 
-        # Low frequence attention (Lo-Fi)
+        # Low frequence attention 
         if self.l_heads > 0:
             if self.ws != 1:
                 self.sr = nn.AvgPool2d(kernel_size=window_size, stride=window_size)
@@ -135,7 +131,7 @@ class HiLo(nn.Module):
             self.l_kv = nn.Linear(self.dim, self.l_dim * 2, bias=qkv_bias)
             self.l_proj = nn.Linear(self.l_dim, self.l_dim)
 
-        # High frequence attention (Hi-Fi)
+        # High frequence attention 
         if self.h_heads > 0:
             self.h_qkv = nn.Linear(self.dim, self.h_dim * 3, bias=qkv_bias)
             self.h_proj = nn.Linear(self.h_dim, self.h_dim)
@@ -150,7 +146,7 @@ class HiLo(nn.Module):
 
 
 
-    def hifi(self, x):
+    def hf(self, x):
         B, H, W, C = x.shape
 
         h_group, w_group = H // self.ws, W // self.ws
@@ -175,7 +171,7 @@ class HiLo(nn.Module):
 
         return x
 
-    def lofi(self, x):
+    def lf(self, x):
         B, H, W, C = x.shape
 
         q = self.l_q(x).reshape(B, H * W, self.l_heads, self.l_dim // self.l_heads).permute(0, 2, 1, 3)
@@ -218,14 +214,14 @@ class HiLo(nn.Module):
                 x = x[:, :H, :W, :]
             return x.reshape(B, N, C)
 
-        hifi_out = self.hifi(x)
-        lofi_out = self.lofi(x)
+        hf_out = self.hf(x)
+        lf_out = self.lf(x)
 
 
         if pad_r > 0 or pad_b > 0:
-            x = torch.cat((hifi_out[:, :H, :W, :], lofi_out[:, :H, :W, :]), dim=-1)
+            x = torch.cat((hf_out[:, :H, :W, :], lf_out[:, :H, :W, :]), dim=-1)
         else:
-            x = torch.cat((hifi_out, lofi_out), dim=-1)
+            x = torch.cat((hf_out, lf_out), dim=-1)
 
         x = x.reshape(B, N, C)
 
