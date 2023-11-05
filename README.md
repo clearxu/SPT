@@ -1,6 +1,6 @@
-# Please note that this repository does not contain any information about any of the authors!
-
-
+# ANONYMOUS
+# This version is for review only and does not contain any author information.
+# The full version will be uploaded after the acceptance of the paper.
 
 
 ## SPT
