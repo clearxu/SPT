@@ -1,7 +1,7 @@
 # ANONYMOUS
 # NOTE:
-## (1) This version is for review only and does not contain any author information.
-## (2) The full version will be uploaded after the acceptance of the paper.
+## This version is for review only and does not contain any author information.
+## The full version will be uploaded after the acceptance of the paper.
 
 
 ## SPT
@@ -13,8 +13,6 @@ To do：
 - [ ] Trained Model (Coming soon)
 
 ### Environment:
-
-Option 1:
 
 - Install pytorch
 
