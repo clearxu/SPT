@@ -1,7 +1,7 @@
 # ANONYMOUS
 # NOTE:
-## This version is for review only and does not contain any author information.
-## The full version will be uploaded after the acceptance of the paper.
+- This version is for review only and does not contain any author information.
+- The full version will be uploaded after the acceptance of the paper.
 
 
 ## SPT
