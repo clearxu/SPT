@@ -1,9 +1,3 @@
-# ANONYMOUS
-# NOTE:
-- This version is for review purposes only and does not include author information.
-- The complete version will be uploaded after the paper is accepted.
-
-
 ## SPT
 ### SPT official implementation.
 To do：
